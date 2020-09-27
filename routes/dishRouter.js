@@ -144,7 +144,7 @@ dishRouter.route('/:dishId/comments')
 
 dishRouter.route('/:dishId/comments/:commentId')
     .get((req, res, next) => {
-        Dishes.findById(req.params.dishId)
+        Dishes.findById(req.params.commentId)
             .then((dish) => {
                 if (dish != null && dish.comments.id(req.params.commentId) != null) {
                     res.statusCode = 200;
@@ -170,7 +170,7 @@ dishRouter.route('/:dishId/comments/:commentId')
             + '/comments/' + req.params.commentId);
     })
     .put((req, res, next) => {
-        Dishes.findById(req.params.dishId)
+        Dishes.findById(req.params.commentId)
             .then((dish) => {
                 if (dish != null && dish.comments.id(req.params.commentId) != null) {
                     if (req.body.rating) {
@@ -200,7 +200,7 @@ dishRouter.route('/:dishId/comments/:commentId')
             .catch((err) => next(err));
     })
     .delete((req, res, next) => {
-        Dishes.findById(req.params.dishId)
+        Dishes.findById(req.params.commentId)
             .then((dish) => {
                 if (dish != null && dish.comments.id(req.params.commentId) != null) {
                     dish.comments.id(req.params.commentId).remove();
