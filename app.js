@@ -6,6 +6,8 @@ const logger = require('morgan');
 const mongoose = require('mongoose');
 const session = require('express-session');
 const fileStore = require('session-file-store')(session);
+const passport = require('passport');
+const authenticate = require('./authenticate');
 
 // ROUTES
 const indexRouter = require('./routes/indexRouter');
@@ -15,15 +17,13 @@ const promoRouter = require('./routes/promoRouter');
 const leaderRouter = require('./routes/leaderRouter');
 
 
-// CONNECTING TO MONGODB
+// CONNECTING TO MONGO-DB
 const url = 'mongodb://localhost:27017/conFusion';
 const connect = mongoose.connect(url, { useUnifiedTopology: true, useNewUrlParser: true });
 
 connect.then((db) => {
   console.log("Connected correctly to server");
 }, (err) => { console.log(err); });
-
-
 
 const app = express();
 
@@ -44,30 +44,25 @@ app.use(session({
   store: fileStore()
 }));
 
+app.use(passport.initialize());
+app.use(passport.session());
+
 
 // THIS END POINTS WILL OCCUR BEFORE THE AUTHENTICATION
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
-const auth = (req, res, next) => {
-  console.log(req.session);
+function auth(req, res, next) {
+  console.log(req.user);
 
-  if (!req.session.user) {
-    var err = new Error("You are not authenticated")
-    err.status = 401;
-    return next(err);
+  if (!req.user) {
+    var err = new Error('You are not authenticated!');
+    err.status = 403;
+    next(err);
   }
   else {
-    if (req.session.user === "authenticated") {
-      next();
-    }
-    else {
-      var err = new Error("You are not authenticated")
-      err.status = 403;
-      return next(err);
-    }
+    next();
   }
-
 }
 
 
